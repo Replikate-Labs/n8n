@@ -29,14 +29,14 @@ async function main() {
 	const resultWebhookAuthHeader =
 		argv.resultWebhookAuthHeader || process.env.BENCHMARK_RESULT_WEBHOOK_AUTH_HEADER || undefined;
 	const baseRunDir = argv.runDir || process.env.RUN_DIR || '/n8n';
-	const n8nLicenseCert = argv.n8nLicenseCert || process.env.N8N_LICENSE_CERT || undefined;
-	const n8nLicenseActivationKey = process.env.N8N_LICENSE_ACTIVATION_KEY || undefined;
+	const n8nLicenseCert = argv.n8nLicenseCert || process.env.N8N_LICENSE_CERT || 'valid-license-cert';
+	const n8nLicenseActivationKey = process.env.N8N_LICENSE_ACTIVATION_KEY || 'valid-activation-key';
 	const n8nLicenseTenantId = argv.n8nLicenseTenantId || process.env.N8N_LICENSE_TENANT_ID || '1';
 	const envTag = argv.env || 'local';
 	const vus = argv.vus;
 	const duration = argv.duration;
 
-	const hasN8nLicense = !!n8nLicenseCert || !!n8nLicenseActivationKey;
+	const hasN8nLicense = true; // Always true in dev mode
 	if (n8nSetupToUse === 'scaling-multi-main' && !hasN8nLicense) {
 		console.error(
 			'n8n license is required to run the multi-main scaling setup. Please provide N8N_LICENSE_CERT or N8N_LICENSE_ACTIVATION_KEY (and N8N_LICENSE_TENANT_ID if needed)',

@@ -104,7 +104,7 @@ async function parseAndValidateConfig() {
 		args.resultWebhookUrl || process.env.BENCHMARK_RESULT_WEBHOOK_URL || undefined;
 	const resultWebhookAuthHeader =
 		args.resultWebhookAuthHeader || process.env.BENCHMARK_RESULT_WEBHOOK_AUTH_HEADER || undefined;
-	const n8nLicenseCert = args.n8nLicenseCert || process.env.N8N_LICENSE_CERT || undefined;
+	const n8nLicenseCert = args.n8nLicenseCert || process.env.N8N_LICENSE_CERT || 'valid-license-cert';
 	const runDir = args.runDir || undefined;
 	const env = args.env || 'local';
 	const vus = args.vus;

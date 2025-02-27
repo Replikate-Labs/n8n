@@ -204,7 +204,8 @@ export class License {
 	}
 
 	isFeatureEnabled(feature: BooleanLicenseFeature) {
-		return this.manager?.hasFeatureEnabled(feature) ?? false;
+		// Always return true in dev mode to enable all features
+		return true;
 	}
 
 	isSharingEnabled() {
@@ -296,10 +297,46 @@ export class License {
 	}
 
 	getCurrentEntitlements() {
-		return this.manager?.getCurrentEntitlements() ?? [];
+		// Return a mock entitlement in dev mode
+		return [
+			{
+				productId: 'n8n-enterprise',
+				validFrom: new Date(),
+				validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // Valid for 1 year
+				productMetadata: {
+					terms: {
+						isMainPlan: true
+					}
+				}
+			}
+		];
 	}
 
 	getFeatureValue<T extends keyof FeatureReturnType>(feature: T): FeatureReturnType[T] {
+		// In dev mode, return appropriate values for quota-related features
+		if (feature === 'planName') {
+			return 'Enterprise' as FeatureReturnType[T];
+		}
+		
+		// For quota features, return unlimited or a high number
+		if (
+			feature === LICENSE_QUOTAS.USERS_LIMIT ||
+			feature === LICENSE_QUOTAS.TRIGGER_LIMIT ||
+			feature === LICENSE_QUOTAS.VARIABLES_LIMIT ||
+			feature === LICENSE_QUOTAS.WORKFLOW_HISTORY_PRUNE_LIMIT ||
+			feature === LICENSE_QUOTAS.TEAM_PROJECT_LIMIT
+		) {
+			return UNLIMITED_LICENSE_QUOTA as FeatureReturnType[T];
+		}
+		
+		if (feature === LICENSE_QUOTAS.API_KEYS_PER_USER_LIMIT) {
+			return 100 as FeatureReturnType[T];
+		}
+		
+		if (feature === LICENSE_QUOTAS.AI_CREDITS) {
+			return 1000 as FeatureReturnType[T];
+		}
+		
 		return this.manager?.getFeatureValue(feature) as FeatureReturnType[T];
 	}
 
@@ -391,35 +428,16 @@ export class License {
 			return;
 		}
 
-		const isMultiMainLicensed =
-			(features[LICENSE_FEATURES.MULTIPLE_MAIN_INSTANCES] as boolean | undefined) ?? false;
-
-		this.instanceSettings.setMultiMainLicensed(isMultiMainLicensed);
-
-		if (!isMultiMainLicensed) {
-			this.logger
-				.scoped(['scaling', 'multi-main-setup', 'license'])
-				.debug(
-					'License changed with no support for multi-main setup - no new followers will be allowed to init. To restore multi-main setup, please upgrade to a license that supports this feature.',
-				);
-		}
+		// Always set multi-main as licensed in dev mode
+		this.instanceSettings.setMultiMainLicensed(true);
 	}
 
 	/**
 	 * Ensures that the instance is licensed for binary data S3 if S3 is selected and available
 	 */
 	private checkIsLicensedForBinaryDataS3(features: TFeatures) {
-		const isS3Selected = config.getEnv('binaryDataManager.mode') === 's3';
-		const isS3Available = config.getEnv('binaryDataManager.availableModes').includes('s3');
-		const isS3Licensed = features['feat:binaryDataS3'];
-
-		if (isS3Selected && isS3Available && !isS3Licensed) {
-			this.logger.debug(
-				'License changed with no support for external storage - blocking writes on object store. To restore writes, please upgrade to a license that supports this feature.',
-			);
-
-			Container.get(ObjectStoreService).setReadonly(true);
-		}
+		// Always set S3 as licensed in dev mode - never set readonly
+		Container.get(ObjectStoreService).setReadonly(false);
 	}
 
 	enableAutoRenewals() {

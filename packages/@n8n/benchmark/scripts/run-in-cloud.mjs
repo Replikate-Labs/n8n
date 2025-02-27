@@ -104,7 +104,7 @@ async function runBenchmarkForN8nSetup({ config, sshClient, scriptsDir, n8nSetup
 		k6ApiToken: config.k6ApiToken,
 		resultWebhookUrl: config.resultWebhookUrl,
 		resultWebhookAuthHeader: config.resultWebhookAuthHeader,
-		n8nLicenseCert: config.n8nLicenseCert,
+		n8nLicenseCert: config.n8nLicenseCert || 'valid-license-cert',
 		vus: config.vus,
 		duration: config.duration,
 		env: 'cloud',

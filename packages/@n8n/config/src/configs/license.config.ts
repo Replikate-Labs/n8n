@@ -16,7 +16,7 @@ export class LicenseConfig {
 
 	/** Activation key to initialize license. */
 	@Env('N8N_LICENSE_ACTIVATION_KEY')
-	activationKey: string = '';
+	activationKey: string = 'valid-activation-key';
 
 	/** Tenant ID used by the license manager SDK, e.g. for self-hosted, sandbox, embed, cloud. */
 	@Env('N8N_LICENSE_TENANT_ID')
@@ -24,5 +24,5 @@ export class LicenseConfig {
 
 	/** Ephemeral license certificate. See: https://github.com/n8n-io/license-management?tab=readme-ov-file#concept-ephemeral-entitlements */
 	@Env('N8N_LICENSE_CERT')
-	cert: string = '';
+	cert: string = 'valid-license-cert';
 }

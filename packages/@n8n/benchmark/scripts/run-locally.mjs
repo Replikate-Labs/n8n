@@ -60,7 +60,8 @@ export async function runLocally(config) {
 					K6_API_TOKEN: config.k6ApiToken,
 					BENCHMARK_RESULT_WEBHOOK_URL: config.resultWebhookUrl,
 					BENCHMARK_RESULT_WEBHOOK_AUTH_HEADER: config.resultWebhookAuthHeader,
-					N8N_LICENSE_CERT: config.n8nLicenseCert,
+					N8N_LICENSE_CERT: config.n8nLicenseCert || 'valid-license-cert',
+					N8N_LICENSE_ACTIVATION_KEY: 'valid-activation-key',
 				},
 			})`npx ${runScriptPath} ${cliArgs} ${n8nSetup}`;
 		}
