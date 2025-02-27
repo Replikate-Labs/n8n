@@ -1,22 +1,13 @@
 name: Build and Push n8n Docker Image
 
 on:
-  workflow_dispatch:
-    inputs:
-      n8n_version:
-        description: 'n8n version to build'
-        required: false
-        default: '1.81.0'
-      node_version:
-        description: 'Node.js version to use'
-        required: false
-        default: '22'
+  push:
+    branches:
+      - replikate
 
 jobs:
   build-base:
     uses: ./.github/workflows/docker-base-image-do.yml
-    with:
-      node_version: ${{ github.event.inputs.node_version || '20' }}
     secrets: inherit
 
   build-and-push:
@@ -38,16 +29,8 @@ jobs:
       - name: Set n8n version and release date
         id: set-version
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.n8n_version }}" ]; then
-            echo "N8N_VERSION=${{ github.event.inputs.n8n_version }}" >> $GITHUB_ENV
-          else
-            echo "N8N_VERSION=1.81.0" >> $GITHUB_ENV
-          fi
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.node_version }}" ]; then
-            echo "NODE_VERSION=${{ github.event.inputs.node_version }}" >> $GITHUB_ENV
-          else
-            echo "NODE_VERSION=22" >> $GITHUB_ENV
-          fi
+          echo "N8N_VERSION=1.81.0" >> $GITHUB_ENV
+          echo "NODE_VERSION=22" >> $GITHUB_ENV
           echo "RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
           echo "SHORT_SHA=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV
 

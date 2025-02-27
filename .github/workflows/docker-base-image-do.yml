@@ -1,17 +1,9 @@
 name: Build and Push n8n Base Image to DigitalOcean
 
 on:
-  workflow_dispatch:
-    inputs:
-      node_version:
-        description: 'Node.js version to build this image with.'
-        type: choice
-        required: true
-        default: '22'
-        options:
-          - '18'
-          - '20'
-          - '22'
+  push:
+    branches:
+      - replikate
 
 jobs:
   build-base:
@@ -37,11 +29,7 @@ jobs:
       - name: Set Node version
         id: set-node-version
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.node_version }}" ]; then
-            echo "NODE_VERSION=${{ github.event.inputs.node_version }}" >> $GITHUB_ENV
-          else
-            echo "NODE_VERSION=22" >> $GITHUB_ENV
-          fi
+          echo "NODE_VERSION=22" >> $GITHUB_ENV
 
       - name: Build and push base image
         uses: docker/build-push-action@v6.11.0
