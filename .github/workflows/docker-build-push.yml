@@ -1,17 +1,16 @@
 name: Build and Push n8n Docker Image
 
 on:
-  push:
-    branches:
-      - replikate
+  workflow_run:
+    workflows: ["Build and Push n8n Base Image to DigitalOcean"]
+    branches: [replikate]
+    types:
+      - completed
 
 jobs:
-  build-base:
-    uses: ./.github/workflows/docker-base-image-do.yml
-    secrets: inherit
 
   build-and-push:
-    needs: build-base
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
