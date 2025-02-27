@@ -9,9 +9,20 @@ on:
         description: 'n8n version to build'
         required: false
         default: '1.81.0'
+      node_version:
+        description: 'Node.js version to use'
+        required: false
+        default: '22'
 
 jobs:
+  build-base:
+    uses: ./.github/workflows/docker-base-image-do.yml
+    with:
+      node_version: ${{ github.event.inputs.node_version || '20' }}
+    secrets: inherit
+
   build-and-push:
+    needs: build-base
     runs-on: ubuntu-latest
 
     steps:
@@ -34,6 +45,11 @@ jobs:
           else
             echo "N8N_VERSION=1.81.0" >> $GITHUB_ENV
           fi
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.node_version }}" ]; then
+            echo "NODE_VERSION=${{ github.event.inputs.node_version }}" >> $GITHUB_ENV
+          else
+            echo "NODE_VERSION=22" >> $GITHUB_ENV
+          fi
           echo "RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
           echo "SHORT_SHA=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV
 
@@ -41,6 +57,7 @@ jobs:
         run: |
           cd ./docker/images/n8n
           docker build -t registry.digitalocean.com/replikate-sg/n8n:${{ env.SHORT_SHA }} \
+            --build-arg NODE_VERSION=${{ env.NODE_VERSION }} \
             --build-arg N8N_VERSION=${{ env.N8N_VERSION }} \
             --build-arg N8N_RELEASE_DATE=${{ env.RELEASE_DATE }} \
             .
