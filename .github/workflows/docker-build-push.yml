@@ -1,8 +1,6 @@
 name: Build and Push n8n Docker Image
 
 on:
-  push:
-    branches: [ replikate ]
   workflow_dispatch:
     inputs:
       n8n_version:

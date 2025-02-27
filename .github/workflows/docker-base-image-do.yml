@@ -12,10 +12,6 @@ on:
           - '18'
           - '20'
           - '22'
-  push:
-    branches: [ replikate ]
-    paths:
-      - 'docker/images/n8n-base/**'
 
 jobs:
   build-base:
