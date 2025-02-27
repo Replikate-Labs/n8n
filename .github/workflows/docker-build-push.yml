@@ -37,11 +37,17 @@ jobs:
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
       
+      - name: Prepare Docker build context
+        run: |
+          mkdir -p docker-build-context
+          cp ./docker/images/n8n/Dockerfile docker-build-context/
+          cp ./docker/images/n8n/docker-entrypoint.sh docker-build-context/
+          cp ./docker/images/n8n/n8n-task-runners.json docker-build-context/
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/images/n8n/Dockerfile
+          context: docker-build-context
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
