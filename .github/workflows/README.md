@@ -2,7 +2,7 @@
 
 ## Docker Build and Push to DigitalOcean Registry
 
-This workflow builds the n8n Docker image and pushes it to your DigitalOcean container registry.
+This workflow builds the n8n Docker image and pushes it to your DigitalOcean container registry using `doctl` for authentication.
 
 ### Setup Instructions
 
