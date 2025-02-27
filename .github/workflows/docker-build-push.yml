@@ -3,7 +3,6 @@ name: Build and Push n8n Docker Image
 on:
   push:
     branches: [ replikate ]
-    tags: [ 'v*' ]
   workflow_dispatch:
 
 jobs:
@@ -12,10 +11,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
       
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.8.0
       
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -25,31 +24,8 @@ jobs:
       - name: Login to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 1200
       
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: registry.digitalocean.com/replikate-sg/n8n
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,format=short
-            type=raw,value=latest,enable={{is_default_branch}}
-      
-      - name: Prepare Docker build context
-        run: |
-          mkdir -p docker-build-context
-          cp ./docker/images/n8n/Dockerfile docker-build-context/
-          cp ./docker/images/n8n/docker-entrypoint.sh docker-build-context/
-          cp ./docker/images/n8n/n8n-task-runners.json docker-build-context/
+      - name: Build container image
+        run: docker build -t registry.digitalocean.com/replikate-sg/n8n:$(echo $GITHUB_SHA | head -c7) .
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: docker-build-context
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/replikate-sg/n8n
