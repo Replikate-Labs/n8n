@@ -4,6 +4,11 @@ on:
   push:
     branches: [ replikate ]
   workflow_dispatch:
+    inputs:
+      n8n_version:
+        description: 'n8n version to build'
+        required: false
+        default: '1.81.0'
 
 jobs:
   build-and-push:
@@ -21,8 +26,24 @@ jobs:
       - name: Login to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 1200
 
-      - name: Build container image
-        run: docker build -t registry.digitalocean.com/replikate-sg/n8n:$(echo $GITHUB_SHA | head -c7) -f ./docker/images/n8n-base/Dockerfile .
+      - name: Set n8n version and release date
+        id: set-version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.n8n_version }}" ]; then
+            echo "N8N_VERSION=${{ github.event.inputs.n8n_version }}" >> $GITHUB_ENV
+          else
+            echo "N8N_VERSION=1.31.0" >> $GITHUB_ENV
+          fi
+          echo "RELEASE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV
+
+      - name: Build n8n image
+        run: |
+          cd ./docker/images/n8n
+          docker build -t registry.digitalocean.com/replikate-sg/n8n:${{ env.SHORT_SHA }} \
+            --build-arg N8N_VERSION=${{ env.N8N_VERSION }} \
+            --build-arg N8N_RELEASE_DATE=${{ env.RELEASE_DATE }} \
+            .
 
       - name: Push image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/replikate-sg/n8n:$(echo $GITHUB_SHA | head -c7)
+        run: docker push registry.digitalocean.com/replikate-sg/n8n:${{ env.SHORT_SHA }}
