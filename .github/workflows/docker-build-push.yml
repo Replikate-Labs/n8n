@@ -2,7 +2,7 @@ name: Build and Push n8n Docker Image
 
 on:
   push:
-    branches: [ master ]
+    branches: [ replikate ]
     tags: [ 'v*' ]
   workflow_dispatch:
 

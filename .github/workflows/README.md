@@ -25,14 +25,14 @@ This workflow builds the n8n Docker image and pushes it to your DigitalOcean con
 ### Workflow Trigger
 
 The workflow runs:
-- On push to the `master` branch
+- On push to the `replikate` branch
 - When you create version tags (`v*`)
 - Manually via GitHub Actions UI (workflow_dispatch)
 
 ### Image Tags
 
 The workflow creates several Docker tags:
-- Branch name (e.g., `master`)
+- Branch name (e.g., `replikate`)
 - Version tag (when pushing a tag like `v1.2.3`)
 - Major.Minor version (e.g., `1.2` for tag `v1.2.3`)
 - Short SHA commit hash
