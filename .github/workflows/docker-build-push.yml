@@ -1,11 +1,9 @@
 name: Build and Push n8n Docker Image
 
 on:
-  workflow_run:
-    workflows: ["Build and Push n8n Base Image to DigitalOcean"]
-    branches: [replikate]
-    types:
-      - completed
+  push:
+    branches:
+      - replikate
 
 jobs:
 
